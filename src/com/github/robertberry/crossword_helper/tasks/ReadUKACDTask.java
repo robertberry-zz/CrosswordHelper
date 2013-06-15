@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ReadUKACDTask extends AsyncTask<InputStream, Void, Either<Throwable, ArrayList<String>>> {
+public class ReadUKACDTask extends AsyncTask<InputStream, Void, Either<Throwable, Map<Integer, ArrayList<String>>>> {
     @Override
-    protected Either<Throwable, ArrayList<String>> doInBackground(InputStream... params) {
+    protected Either<Throwable, Map<Integer, ArrayList<String>>> doInBackground(InputStream... params) {
         InputStream inputStream = params[0];
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -26,17 +28,20 @@ public class ReadUKACDTask extends AsyncTask<InputStream, Void, Either<Throwable
                 if (isCancelled())
                     break;
 
-            ArrayList<String> words = new ArrayList<String>();
+            Map<Integer, ArrayList<String>> wordsByLength = new HashMap<Integer, ArrayList<String>>();
 
             while ((line = reader.readLine()) != null) {
                 if (isCancelled())
                     break;
-                words.add(line);
+                if (!wordsByLength.containsKey(line.length())) {
+                    wordsByLength.put(line.length(), new ArrayList<String>());
+                }
+                wordsByLength.get(line.length()).add(line);
             }
 
-            return new Right<Throwable, ArrayList<String>>(words);
+            return new Right<Throwable, Map<Integer, ArrayList<String>>>(wordsByLength);
         } catch (IOException error) {
-            return new Left<Throwable, ArrayList<String>>(error);
+            return new Left<Throwable, Map<Integer, ArrayList<String>>>(error);
         }
     }
 }

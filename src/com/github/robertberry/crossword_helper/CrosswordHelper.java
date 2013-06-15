@@ -15,6 +15,8 @@ import com.google.common.base.Optional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class CrosswordHelper extends Activity {
@@ -34,12 +36,19 @@ public class CrosswordHelper extends Activity {
 
         new ReadUKACDTask() {
             @Override
-            protected void onPostExecute(Either<Throwable, ArrayList<String>> result) {
+            protected void onPostExecute(Either<Throwable, Map<Integer, ArrayList<String>>> result) {
                 if (result.isLeft()) {
                     Log.e(TAG, "Error loading dictionary: " + result.left().leftValue);
                 } else {
-                    ArrayList<String> dictionary = result.right().rightValue;
-                    Log.i(TAG, "Finished loading dictionary with " + dictionary.size() + " words");
+                    Map<Integer, ArrayList<String>> dictionary = result.right().rightValue;
+                    Integer size = 0;
+
+                    for (ArrayList<String> wordList : dictionary.values()) {
+                        size += wordList.size();
+                    }
+
+                    Log.i(TAG, "Finished loading dictionary with " + dictionary.size() +
+                            " different lengths and a total of " + size + " words");
                     onLoadDictionary(dictionary);
                 }
             }
@@ -68,7 +77,7 @@ public class CrosswordHelper extends Activity {
         queryEdit.setText("");
     }
 
-    public void onLoadDictionary(ArrayList<String> dictionary) {
+    public void onLoadDictionary(Map<Integer, ArrayList<String>> dictionary) {
         new GenerateSearchTreeTask() {
             @Override
             protected void onPostExecute(SearchTree tree) {

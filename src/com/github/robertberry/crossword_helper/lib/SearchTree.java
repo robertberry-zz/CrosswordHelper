@@ -5,7 +5,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SearchTree {
     private static final String TAG = "SearchTree";
@@ -35,19 +37,23 @@ public class SearchTree {
         }
     }
 
-    private final Optional<Node> root;
+    private final Map<Integer, Optional<Node>> treesByWordLength = new HashMap<Integer, Optional<Node>>();
 
     /**
      * Given an array of sorted words, constructs the search tree
      *
-     * @param words Words in ascending order
+     * @param wordsByLength Map of words by their length in ascending alphabetical order
      */
-    public SearchTree(List<String> words) {
-        root = nodeFor(words, 0, words.size() - 1);
+    public SearchTree(Map<Integer, ArrayList<String>> wordsByLength) {
+        for (Integer length: wordsByLength.keySet()) {
+            List<String> words = wordsByLength.get(length);
+
+            treesByWordLength.put(length, nodeFor(words, 0, words.size() - 1));
+        }
     }
 
-    public ImmutableSet<String> search(Iterable<Optional<Character>> term) {
-        return wordsFor(term, root);
+    public ImmutableSet<String> search(List<Optional<Character>> term) {
+        return wordsFor(term, treesByWordLength.get(term.size()));
     }
 
     public ImmutableSet<String> search(String searchTerm) {
@@ -64,7 +70,7 @@ public class SearchTree {
         return search(newSearchTerm);
     }
 
-    private ImmutableSet<String> wordsFor(Iterable<Optional<Character>> term, Optional<Node> node) {
+    private ImmutableSet<String> wordsFor(List<Optional<Character>> term, Optional<Node> node) {
         if (node.isPresent()) {
             Node n = node.get();
 
@@ -105,7 +111,7 @@ public class SearchTree {
         }
     }
 
-    private MatchInformation match(Iterable<Optional<Character>> term, String word) {
+    private MatchInformation match(List<Optional<Character>> term, String word) {
         Integer i = 0;
         int wordLength = word.length();
 
@@ -129,8 +135,6 @@ public class SearchTree {
             i++;
         }
 
-        // term matched all of word we searched through - if this is whole word, match it. search left tree if word is
-        // larger than search term
-        return new MatchInformation(wordLength == i, hasSeenAbsent || wordLength > i, hasSeenAbsent);
+        return new MatchInformation(true, hasSeenAbsent, hasSeenAbsent);
     }
 }
