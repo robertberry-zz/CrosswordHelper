@@ -1,9 +1,16 @@
-package com.github.robertberry.crossword_helper.wordtree;
+package com.github.robertberry.crossword_helper.lib;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
-public class WordTree {
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SearchTree {
     /** Simple immutable node for the tree */
     final private static class Node {
         final public String word;
@@ -17,13 +24,13 @@ public class WordTree {
         }
     }
 
-    private static Optional<Node> nodeFor(String[] words, Integer left, Integer right) {
+    private static Optional<Node> nodeFor(List<String> words, Integer left, Integer right) {
         if (left > right) {
             return Optional.absent();
         } else {
             // The central word should be the root node
             Integer middle = (left + right) / 2;
-            String word = words[middle];
+            String word = words.get(middle);
             return Optional.of(new Node(word, nodeFor(words, left, middle - 1),
                     nodeFor(words, middle + 1, right)));
         }
@@ -36,12 +43,26 @@ public class WordTree {
      *
      * @param words Words in ascending order
      */
-    public WordTree(String[] words) {
-        root = nodeFor(words, 0, words.length);
+    public SearchTree(List<String> words) {
+        root = nodeFor(words, 0, words.size());
     }
 
     public ImmutableSet<String> search(Iterable<Optional<Character>> term) {
         return wordsFor(term, root);
+    }
+
+    public ImmutableSet<String> search(String searchTerm) {
+        ArrayList<Optional<Character>> newSearchTerm = new ArrayList<Optional<Character>>();
+
+        for (Character ch : searchTerm.toCharArray()) {
+            if (ch == '?') {
+                newSearchTerm.add(Optional.<Character>absent());
+            } else {
+                newSearchTerm.add(Optional.of(ch));
+            }
+        }
+
+        return search(newSearchTerm);
     }
 
     private ImmutableSet<String> wordsFor(Iterable<Optional<Character>> term, Optional<Node> node) {
@@ -107,5 +128,23 @@ public class WordTree {
         // term matched all of word we searched through - if this is whole word, match it. search left tree if word is
         // larger than search term
         return new MatchInformation(wordLength == i, hasSeenAbsent || wordLength > i, hasSeenAbsent);
+    }
+
+    public static SearchTree ofUKACDStream(InputStream inputStream) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+        String line;
+
+        // Skip the UKACD copyright notice
+        while ((line = reader.readLine()) != null && !line.startsWith("-"))
+            ;
+
+        ArrayList<String> words = new ArrayList<String>();
+
+        while ((line = reader.readLine()) != null) {
+            words.add(line);
+        }
+
+        return new SearchTree(words);
     }
 }
