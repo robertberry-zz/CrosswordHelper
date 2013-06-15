@@ -129,22 +129,4 @@ public class SearchTree {
         // larger than search term
         return new MatchInformation(wordLength == i, hasSeenAbsent || wordLength > i, hasSeenAbsent);
     }
-
-    public static SearchTree ofUKACDStream(InputStream inputStream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-        String line;
-
-        // Skip the UKACD copyright notice
-        while ((line = reader.readLine()) != null && !line.startsWith("-"))
-            ;
-
-        ArrayList<String> words = new ArrayList<String>();
-
-        while ((line = reader.readLine()) != null) {
-            words.add(line);
-        }
-
-        return new SearchTree(words);
-    }
 }
