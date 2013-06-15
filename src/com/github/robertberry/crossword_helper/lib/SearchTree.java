@@ -1,5 +1,6 @@
 package com.github.robertberry.crossword_helper.lib;
 
+import android.util.Log;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
@@ -7,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchTree {
+    private static final String TAG = "SearchTree";
+
     /** Simple immutable node for the tree */
     final private static class Node {
         final public String word;
@@ -65,7 +68,12 @@ public class SearchTree {
         if (node.isPresent()) {
             Node n = node.get();
 
+            Log.i(TAG, "Matching against " + n.word);
+
             MatchInformation matchInfo = match(term, n.word);
+
+            Log.i(TAG, "Matched [word: " + matchInfo.matchWord +
+                    ", left: " + matchInfo.matchLeft + ", right: " + matchInfo.matchRight + "]");
 
             ImmutableSet.Builder<String> words = ImmutableSet.builder();
 
@@ -109,7 +117,7 @@ public class SearchTree {
 
             if (!isPresent) hasSeenAbsent = true;
 
-            if (i > wordLength) {
+            if (i == wordLength) {
                 // term is larger than word - continue to search right subtree
                 return new MatchInformation(false, hasSeenAbsent, true);
             } else if (isPresent && ch.get() != word.charAt(i)) {
