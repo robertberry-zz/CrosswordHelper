@@ -3,10 +3,6 @@ package com.github.robertberry.crossword_helper.lib;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +32,7 @@ public class SearchTree {
         }
     }
 
-    private Optional<Node> root;
+    private final Optional<Node> root;
 
     /**
      * Given an array of sorted words, constructs the search tree
@@ -44,7 +40,7 @@ public class SearchTree {
      * @param words Words in ascending order
      */
     public SearchTree(List<String> words) {
-        root = nodeFor(words, 0, words.size());
+        root = nodeFor(words, 0, words.size() - 1);
     }
 
     public ImmutableSet<String> search(Iterable<Optional<Character>> term) {
