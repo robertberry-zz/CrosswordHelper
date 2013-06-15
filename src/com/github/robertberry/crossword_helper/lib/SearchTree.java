@@ -1,6 +1,5 @@
 package com.github.robertberry.crossword_helper.lib;
 
-import android.util.Log;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
@@ -74,12 +73,7 @@ public class SearchTree {
         if (node.isPresent()) {
             Node n = node.get();
 
-            Log.i(TAG, "Matching against " + n.word);
-
             MatchInformation matchInfo = match(term, n.word);
-
-            Log.i(TAG, "Matched [word: " + matchInfo.matchWord +
-                    ", left: " + matchInfo.matchLeft + ", right: " + matchInfo.matchRight + "]");
 
             ImmutableSet.Builder<String> words = ImmutableSet.builder();
 
