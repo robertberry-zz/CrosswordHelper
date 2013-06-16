@@ -57,6 +57,10 @@ public class CrosswordHelper extends Activity {
     }
 
     public void showSearchResults(List<String> results) {
+        if (results.isEmpty()) {
+            results.add("No results");
+        }
+
         final ListView resultView = (ListView) findViewById(R.id.search_results);
 
         final ArrayAdapter resultAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, results);
