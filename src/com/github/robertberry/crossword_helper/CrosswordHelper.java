@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import com.github.robertberry.crossword_helper.lib.SearchTree;
 import com.github.robertberry.crossword_helper.tasks.GenerateSearchTreeTask;
 import com.github.robertberry.crossword_helper.tasks.ReadUKACDTask;
@@ -14,6 +16,7 @@ import com.google.common.base.Optional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,6 +56,13 @@ public class CrosswordHelper extends Activity {
         }.execute(ukacd);
     }
 
+    public void showSearchResults(List<String> results) {
+        final ListView resultView = (ListView) findViewById(R.id.search_results);
+
+        final ArrayAdapter resultAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, results);
+        resultView.setAdapter(resultAdapter);
+    }
+
     public void triggerSearch(View view) {
         EditText queryEdit = (EditText) findViewById(R.id.query);
         final String query = queryEdit.getText().toString();
@@ -66,6 +76,7 @@ public class CrosswordHelper extends Activity {
                     for (String word: words) {
                         Log.i(TAG, word);
                     }
+                    showSearchResults(new ArrayList<String>(words));
                 }
             }.execute(query);
         } else {
