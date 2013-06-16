@@ -1,6 +1,7 @@
 package com.github.robertberry.crossword_helper;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -28,6 +29,8 @@ public class CrosswordHelper extends Activity {
 
     private Optional<SearchTree> searchTree = Optional.absent();
 
+    private ProgressDialog loadingDictionaryDialog;
+
     /**
      * Called when the activity is first created.
      */
@@ -35,6 +38,8 @@ public class CrosswordHelper extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        loadingDictionaryDialog = ProgressDialog.show(this, "", getString(R.string.loading_dictionary));
 
         InputStream ukacd = getResources().openRawResource(R.raw.ukacd);
 
@@ -53,6 +58,9 @@ public class CrosswordHelper extends Activity {
 
                     Log.i(TAG, "Finished loading dictionary with " + dictionary.size() +
                             " different lengths and a total of " + size + " words");
+
+                    loadingDictionaryDialog.setMessage(getString(R.string.building_search_tree));
+
                     onLoadDictionary(dictionary);
                 }
             }
@@ -112,6 +120,8 @@ public class CrosswordHelper extends Activity {
                 Log.i(TAG, "Finished generating search tree.");
                 // This is OK and does not need synchronisation as the search tree is isolated to the UI thread
                 searchTree = Optional.of(tree);
+
+                loadingDictionaryDialog.hide();
             }
         }.execute(dictionary);
     }
