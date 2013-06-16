@@ -12,10 +12,8 @@ import com.github.robertberry.crossword_helper.tasks.SearchTask;
 import com.github.robertberry.crossword_helper.util.Either;
 import com.google.common.base.Optional;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
