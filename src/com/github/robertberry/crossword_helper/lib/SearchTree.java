@@ -1,5 +1,6 @@
 package com.github.robertberry.crossword_helper.lib;
 
+import android.util.Log;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
@@ -52,7 +53,23 @@ public class SearchTree {
     }
 
     public ImmutableSet<String> search(List<Optional<Character>> term) {
-        return wordsFor(term, treesByWordLength.get(term.size()));
+        if (treesByWordLength.containsKey(term.size())) {
+            return wordsFor(term, treesByWordLength.get(term.size()));
+        } else {
+            Log.w(TAG, "User searched for word of length (" + term.size() + ") for which we have no tree: " +
+                    queryBackToString(term));
+            return ImmutableSet.of();
+        }
+    }
+
+    private String queryBackToString(List<Optional<Character>> query) {
+        String s = "";
+
+        for (Optional<Character> ch : query) {
+            s += ch.or('?');
+        }
+
+        return s;
     }
 
     public ImmutableSet<String> search(String searchTerm) {

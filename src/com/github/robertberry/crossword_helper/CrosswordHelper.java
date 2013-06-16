@@ -3,10 +3,13 @@ package com.github.robertberry.crossword_helper;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import com.github.robertberry.crossword_helper.lib.SearchTree;
 import com.github.robertberry.crossword_helper.tasks.GenerateSearchTreeTask;
 import com.github.robertberry.crossword_helper.tasks.ReadUKACDTask;
@@ -54,6 +57,20 @@ public class CrosswordHelper extends Activity {
                 }
             }
         }.execute(ukacd);
+
+        final EditText searchBox = (EditText) findViewById(R.id.query);
+
+        searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    triggerSearch(searchBox);
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     public void showSearchResults(List<String> results) {
@@ -86,8 +103,6 @@ public class CrosswordHelper extends Activity {
         } else {
             Log.i(TAG, "Search tree has not been generated yet.");
         }
-
-        queryEdit.setText("");
     }
 
     public void onLoadDictionary(Map<Integer, ArrayList<String>> dictionary) {
